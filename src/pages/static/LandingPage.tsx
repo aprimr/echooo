@@ -20,7 +20,7 @@ import {
 } from "react-icons/fi";
 import { FaAngleUp } from "react-icons/fa";
 import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
-import useAuthStore from "../store/auth";
+import useAuthStore from "../../store/auth";
 
 type FAQProps = {
   openFaq: number | null;
@@ -30,7 +30,7 @@ type FAQProps = {
 const LandingPage: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  
+
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
@@ -85,10 +85,10 @@ const LandingPage: React.FC = () => {
                 </button>
               ) : (
                 <button
-                  onClick={() => navigate("/chats")}
+                  onClick={() => navigate("/app/home")}
                   className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 hover:via-blue-500 hover:to-indigo-500 text-white px-6 py-2.5 rounded-full font-semibold hover:shadow-lg cursor-pointer"
                 >
-                  Continue Chat
+                  Continue To Echooo
                 </button>
               )}
             </div>
@@ -143,9 +143,9 @@ const LandingPage: React.FC = () => {
                 ) : (
                   <button
                     className="block mx-3 mt-4 w-[calc(100%-1.5rem)] bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-full font-semibold text-center hover:shadow-lg transition-all duration-200"
-                    onClick={() => navigate("/chats")}
+                    onClick={() => navigate("/app/home")}
                   >
-                    Continue Chat
+                    Continue To Echooo
                   </button>
                 )}
               </div>

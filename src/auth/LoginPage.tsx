@@ -14,8 +14,8 @@ const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (!loading && user) {
-      console.log("User already authenticated, redirecting to /chats...");
-      navigate("/chats");
+      console.log("User already authenticated.");
+      navigate("/app/home");
     }
   }, [user, loading, navigate]);
 
