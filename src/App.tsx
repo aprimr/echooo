@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 import LoginPage from "./auth/LoginPage";
@@ -5,7 +6,6 @@ import LandingPage from "./pages/static/LandingPage";
 import TermsAndPrivacy from "./pages/static/TermsAndPrivacy";
 import LoginError from "./pages/errors/LoginError";
 import useAuthStore from "./store/auth";
-import { useEffect } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/errors/NotFound";
 import Layout from "./pages/Layout";
