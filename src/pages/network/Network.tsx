@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 import { searchFriends } from "../../lib/networkManagement";
+import { Timestamp } from "firebase/firestore";
 
 enum Tabs {
   INVITES = "invites",
   MANAGE = "manage",
 }
 
-type User = {
+type UserSearchResult = {
   uid: string;
   name: string;
-  email: string;
   photoURL: string;
+  email: string;
+  keywords: string[];
+  createdAt: Timestamp;
   friends: string[];
-  createdAt: Date;
+  sentRequests: string[];
+  receivedRequests: string[];
 };
 
 interface NetworkNavigationProps {
@@ -39,30 +43,38 @@ const NetworkNavigation = ({ tab, setTab }: NetworkNavigationProps) => {
   const [search, setSearch] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
 
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
 
-  // check input and update debounced search
+  // Debounce the search input
   useEffect(() => {
     if (search.trim() === "") {
       setDebouncedSearch("");
       setSearchResults([]);
+      return;
     }
 
-    // update debounced search after 500ms
     const timer = setTimeout(() => {
-      setDebouncedSearch(search);
+      setDebouncedSearch(search.trim());
     }, 500);
 
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Actual search on the base of debounced data
+  // Perform the search when debounced value updates
   useEffect(() => {
-    if (debouncedSearch.trim() !== "") {
-      searchFriends(debouncedSearch).then((results) => {
+    if (debouncedSearch === "") return;
+
+    const fetchResults = async () => {
+      try {
+        const results = await searchFriends(debouncedSearch);
+        console.log("Search Result:", results);
         setSearchResults(results);
-      });
-    }
+      } catch (err) {
+        console.error("Search error:", err);
+      }
+    };
+
+    fetchResults();
   }, [debouncedSearch]);
 
   return (
@@ -131,7 +143,7 @@ const NetworkNavigation = ({ tab, setTab }: NetworkNavigationProps) => {
 
           <div className="flex flex-col gap-3">
             {/* Search Result Card */}
-            {searchResults?.map((user: User) => (
+            {searchResults?.map((user: UserSearchResult) => (
               <div
                 key={user.uid}
                 className="w-full flex flex-row justify-between items-center gap-3 p-3 bg-neutral-100 hover:bg-neutral-200/70 rounded-lg transition-all shadow-sm overflow-hidden"

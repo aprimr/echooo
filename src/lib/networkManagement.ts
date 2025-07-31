@@ -5,11 +5,24 @@ import {
   doc,
   getDocs,
   query,
+  Timestamp,
   updateDoc,
   where,
 } from "firebase/firestore";
 
-export async function searchFriends(name: string) {
+type UserSearchResult = {
+  uid: string;
+  name: string;
+  photoURL: string;
+  email: string;
+  keywords: string[];
+  createdAt: Timestamp;
+  friends: string[];
+  sentRequests: string[];
+  receivedRequests: string[];
+};
+
+export async function searchFriends(name: string): Promise<UserSearchResult[]> {
   // search query
   const q = query(
     collection(db, "users"),
@@ -17,7 +30,10 @@ export async function searchFriends(name: string) {
   );
 
   const snapshot = await getDocs(q);
-  const results = snapshot.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
+  const results = snapshot.docs.map((doc) => ({
+    uid: doc.id,
+    ...doc.data(),
+  })) as UserSearchResult[];
 
   return results;
 }
