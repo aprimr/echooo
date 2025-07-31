@@ -1,10 +1,11 @@
 import useAuthStore from "../store/auth";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { FiLogOut, FiSearch, FiSettings, FiUser } from "react-icons/fi";
+import { FiLogOut, FiSettings, FiUser } from "react-icons/fi";
 
 const Header = () => {
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -21,24 +22,24 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full h-12 px-5 flex items-center justify-between bg-white backdrop-blur-md border-b border-white/20 shadow-sm z-50 rounded-b-xl">
+    <header className="fixed top-0 left-0 w-full h-12 px-5 flex items-center justify-between bg-white backdrop-blur-md border-b border-white/20 shadow-sm z-50">
       <p className="text-2xl font-semibold text-gray-900 font-inter tracking-tight">
         echooo
       </p>
 
       <div className="flex items-center gap-2 relative">
         {/* Search Icon */}
-        <button className="p-2 rounded-xl bg-white/20 backdrop-blur-md hover:bg-white/30 transition duration-200">
+        {/* <button className="p-2 rounded-xl bg-white/20 backdrop-blur-md hover:bg-white/30 transition duration-200">
           <FiSearch size={20} className="text-gray-800" />
-        </button>
+        </button> */}
 
         {/* Profile Picture */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="h-9 w-9 rounded-full border border-white/40 shadow-md overflow-hidden transition"
+          className="h-9 w-9 rounded-full border border-white/40 shadow-md overflow-hidden transition cursor-pointer"
         >
           <img
-            src={user?.photoURL || "/default-avatar.png"}
+            src={user?.photoURL || "../../public/echooo.png"}
             alt={user?.displayName || "Profile"}
             className="h-full w-full object-cover"
           />
@@ -87,8 +88,11 @@ const Header = () => {
               </button>
 
               <button
-                className="px-4 py-2.5 text-left text-red-500 hover:bg-red-50/80 active:bg-red-100 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
+                className="px-4 py-2.5 text-left text-red-500 hover:bg-red-50/80 active:bg-red-100 transition-colors cursor-pointer"
+                onClick={() => {
+                  logout();
+                  setIsMenuOpen(false);
+                }}
               >
                 <div className="flex items-center gap-3">
                   <FiLogOut size={16} className="text-red-400" />

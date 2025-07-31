@@ -7,6 +7,7 @@ import {
 import { create } from "zustand";
 import { auth, googleProvider } from "../firebase/config";
 import { toast } from "sonner";
+import { saveUserIfNotExists } from "../lib/firestoreHelpers";
 
 interface AuthState {
   user: User | null;
@@ -52,6 +53,7 @@ const useAuthStore = create<AuthState>((set) => ({
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
+      await saveUserIfNotExists(user);
       set({ user, loading: false });
     } catch (err: any) {
       console.error("Google Sign-In Error:", err);

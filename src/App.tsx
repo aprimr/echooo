@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/errors/NotFound";
 import Layout from "./pages/Layout";
 import Chats from "./pages/chats/Chats";
+import Network from "./pages/network/Network";
 
 function App() {
   const { checkAuthStatus } = useAuthStore();
@@ -38,7 +39,7 @@ function App() {
           <Route index element={<div>app</div>} />
           <Route path="home" element={<div>home</div>} />
           <Route path="chats" element={<Chats />} />
-          <Route path="network" element={<div>friends</div>} />
+          <Route path="network" element={<Network />} />
           <Route path="me" element={<div>ME</div>} />
         </Route>
 

@@ -1,9 +1,11 @@
 import { NavLink } from "react-router-dom";
 import { PiChats, PiWall, PiUsers, PiUserCircle } from "react-icons/pi";
+import NavigationRibbon from "./NavigationRibbon";
 
 const Navigation = () => {
   return (
     <footer className="fixed bottom-0 left-0 w-full h-16 bg-white backdrop-blur-lg border-t border-gray-200 z-50">
+      <NavigationRibbon />
       <div className="flex items-center justify-around h-full px-4">
         {/* Feed */}
         <NavLink

@@ -8,7 +8,7 @@ const Layout: React.FC = () => {
       <Header />
       <div className="h-12" />
       <Outlet />
-      <div className="h-14" />
+      <div className="h-24" />
       <Navigation />
     </div>
   );
