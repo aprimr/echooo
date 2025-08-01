@@ -1,8 +1,11 @@
 import { db } from "../firebase/config";
 import {
+  arrayRemove,
   arrayUnion,
   collection,
   doc,
+  DocumentData,
+  getDoc,
   getDocs,
   query,
   Timestamp,
@@ -51,4 +54,70 @@ export async function sendFriendRequest(fromId: string, toId: string) {
   updateDoc(toRef, {
     receivedRequests: arrayUnion({ from: fromId, at: Date.now() }),
   });
+}
+
+export async function cancelFriendRequest(fromId: string, toId: string) {
+  const fromRef = doc(db, "users", fromId);
+  const toRef = doc(db, "users", toId);
+
+  const [fromSnap, toSnap] = await Promise.all([
+    getDoc(fromRef),
+    getDoc(toRef),
+  ]);
+
+  if (!fromSnap.exists() || !toSnap.exists()) return;
+
+  const fromData = fromSnap.data();
+  const toData = toSnap.data();
+
+  const sentRequest = fromData.sentRequests?.find(
+    (r: DocumentData) => r.to === toId
+  );
+  const receivedRequest = toData.receivedRequests?.find(
+    (r: DocumentData) => r.from === fromId
+  );
+
+  if (!sentRequest || !receivedRequest) return;
+
+  await Promise.all([
+    updateDoc(fromRef, {
+      sentRequests: arrayRemove(sentRequest),
+    }),
+    updateDoc(toRef, {
+      receivedRequests: arrayRemove(receivedRequest),
+    }),
+  ]);
+}
+
+export async function acceptFriendRequest(fromId: string, toId: string) {
+  const fromRef = doc(db, "users", fromId);
+  const toRef = doc(db, "users", toId);
+
+  const [fromSnap, toSnap] = await Promise.all([
+    getDoc(fromRef),
+    getDoc(toRef),
+  ]);
+  if (!fromSnap.exists() || !toSnap.exists()) return;
+
+  const fromData = fromSnap.data();
+  const toData = toSnap.data();
+
+  const updatedSentRequests = (fromData.sentRequests || []).filter(
+    (r: DocumentData) => r.to !== toId
+  );
+
+  const updatedReceivedRequests = (toData.receivedRequests || []).filter(
+    (r: DocumentData) => r.from !== fromId
+  );
+
+  await Promise.all([
+    updateDoc(fromRef, {
+      friends: arrayUnion(toId),
+      sentRequests: updatedSentRequests,
+    }),
+    updateDoc(toRef, {
+      friends: arrayUnion(fromId),
+      receivedRequests: updatedReceivedRequests,
+    }),
+  ]);
 }
