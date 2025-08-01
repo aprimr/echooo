@@ -41,6 +41,7 @@ function App() {
           <Route path="chats" element={<Chats />} />
           <Route path="network" element={<Network />} />
           <Route path="me" element={<div>ME</div>} />
+          <Route path="user/:id" element={<div>user</div>} />
         </Route>
 
         <Route path="/error/login" element={<LoginError />} />

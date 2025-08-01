@@ -121,3 +121,31 @@ export async function acceptFriendRequest(fromId: string, toId: string) {
     }),
   ]);
 }
+
+export async function unfriend(fromId: string, toId: string) {
+  const fromRef = doc(db, "users", fromId);
+  const toRef = doc(db, "users", toId);
+
+  const [fromSnap, toSnap] = await Promise.all([
+    getDoc(fromRef),
+    getDoc(toRef),
+  ]);
+
+  if (!fromSnap.exists() || !toSnap.exists()) return;
+
+  const fromData = fromSnap.data();
+  const toData = toSnap.data();
+
+  const updatedFriends = (fromData.friends || []).filter(
+    (f: string) => f !== toId
+  );
+
+  await Promise.all([
+    updateDoc(fromRef, {
+      friends: updatedFriends,
+    }),
+    updateDoc(toRef, {
+      friends: (toData.friends || []).filter((f: string) => f !== fromId),
+    }),
+  ]);
+}

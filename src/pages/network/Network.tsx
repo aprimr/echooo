@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { FiCheck, FiSearch, FiX } from "react-icons/fi";
+import { FiCheck, FiMessageSquare, FiSearch, FiX } from "react-icons/fi";
 import { DocumentData, Timestamp } from "firebase/firestore";
 import {
   searchFriends,
   sendFriendRequest,
   cancelFriendRequest,
   acceptFriendRequest,
+  unfriend,
 } from "../../lib/networkManagement";
 import {
+  getImageUrlByUid,
   getLoginedUserDetails,
   getUserDetails,
 } from "../../lib/firestoreHelpers";
 import { getRelativeTime } from "../../utils/getRelativeTime";
+import getMutualFriends from "../../utils/getMutualFriends";
+import { NavLink } from "react-router-dom";
+import { TbDotsVertical } from "react-icons/tb";
+import { LuUserRound, LuUserRoundX } from "react-icons/lu";
 
 enum Tabs {
   INVITES = "invites",
@@ -34,7 +40,7 @@ type UserSearchResult = {
 interface NetworkNavigationProps {
   tab: Tabs;
   setTab: (tab: Tabs) => void;
-  loginedUser: DocumentData | null;
+  loginedUser: DocumentData | UserSearchResult | null;
 }
 
 interface TabsProps {
@@ -56,10 +62,10 @@ const Network: React.FC = () => {
   }, [loginedUser]);
 
   return (
-    <div className="min-h-[100svh] w-full flex flex-col gap-4 px-5 py-4">
+    <div className="min-h-[80svh] w-full flex flex-col gap-4 px-5 py-4">
       <NetworkNavigation tab={tab} setTab={setTab} loginedUser={loginedUser} />
       {tab === Tabs.INVITES && <Invites loginedUser={loginedUser} />}
-      {tab === Tabs.MANAGE && <Manage />}
+      {tab === Tabs.MANAGE && <Manage loginedUser={loginedUser} />}
     </div>
   );
 };
@@ -171,7 +177,7 @@ const NetworkNavigation = ({
 
       {/* Search results */}
       {isSearchOpen && (
-        <div className="absolute top-[115px] left-0 w-full min-h-screen bg-white px-4 py-4 pb-20 z-10">
+        <div className="absolute top-[115px] left-0 w-full min-h-[80svh] bg-white px-4 py-4 pb-20 z-10">
           <p className="text-sm text-neutral-500 font-poppins mb-3">
             {searchResults.length >= 1 ? "Search Results" : "No Results Found"}
           </p>
@@ -184,24 +190,36 @@ const NetworkNavigation = ({
                 className="w-full flex flex-row justify-between items-center gap-3 p-3 bg-neutral-100 hover:bg-neutral-200/70 rounded-lg transition-all shadow-sm overflow-hidden"
               >
                 {/* User Info */}
-                <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
+                <NavLink
+                  to={`/app/user/${searchUser.uid}`}
+                  className="flex flex-row justify-start items-center gap-3 w-full sm:w-auto min-w-0"
+                >
+                  {/* Avatar */}
                   <img
-                    src={searchUser.photoURL}
+                    src={searchUser.photoURL || "/default-avatar.png"}
                     alt={searchUser.uid}
-                    className="h-10 w-10 rounded-full border-2 border-white object-cover flex-shrink-0"
+                    className="h-10 w-10 rounded-full border-2 border-white object-cover shrink-0"
                   />
-                  <div className="flex  flex-col overflow-hidden min-w-0">
-                    <p className="text-md font-medium text-neutral-700 font-inter truncate">
+
+                  {/* Name + Friend Count */}
+                  <div className="flex flex-col overflow-hidden min-w-0">
+                    <p className="text-sm font-medium text-neutral-700 font-inter truncate">
                       {searchUser.name}
                     </p>
                     <div className="text-xs flex gap-1 text-neutral-500 font-poppins truncate">
                       <span className="font-semibold">
-                        {searchUser.friends.length}
+                        {loginedUser &&
+                          getMutualFriends(searchUser, loginedUser).length}
                       </span>
-                      <span>Friends</span>
+                      <span>
+                        {loginedUser &&
+                        getMutualFriends(searchUser, loginedUser).length > 1
+                          ? "Mutual Friends"
+                          : "Mutual Friend"}
+                      </span>
                     </div>
                   </div>
-                </div>
+                </NavLink>
 
                 {loginedUser &&
                   searchUser &&
@@ -318,34 +336,42 @@ const Invites = ({ loginedUser }: TabsProps) => {
         {receivedFriendRequests.map((user) => (
           <div
             key={user.uid}
-            className="flex items-center justify-between px-3 py-2 bg-blue-100/40 rounded shadow"
+            className="flex items-center justify-between gap-3 px-3 py-2 bg-blue-100/40 rounded shadow w-full"
           >
-            <div className="flex items-center gap-3">
+            <NavLink
+              to={`/app/user/${user.uid}`}
+              className="flex items-center gap-3 w-full overflow-hidden"
+            >
               <img
-                src={user.photoURL}
+                src={user.photoURL || "/default-avatar.png"}
                 alt={user.name}
-                className="h-10 w-10 rounded-full object-cover"
+                className="h-10 w-10 rounded-full object-cover shrink-0"
               />
-              <div className="h-full flex flex-col justify-between">
-                <p className="text-base font-poppins">{user.name}</p>
-                <p className="text-[10px] text-neutral-400 font-poppins">
+
+              {/* Name */}
+              <div className="flex flex-col justify-center w-full overflow-hidden">
+                <p className="text-sm font-poppins font-medium truncate">
+                  {user.name}
+                </p>
+                <p className="text-[10px] text-neutral-400 font-poppins whitespace-nowrap">
                   {getRelativeTime(user.requestedOn)}
                 </p>
               </div>
-            </div>
+            </NavLink>
 
-            <div className="flex gap-2">
+            {/* Buttons */}
+            <div className="flex gap-2 shrink-0">
               <button
                 onClick={() => acceptFriendRequest(user.uid, loginedUser.uid)}
-                className="text-sm p-2 flex items-center justify-center bg-emerald-200/70 text-emerald-600/70 border-2 border-emerald-400 rounded-full shadow-md"
+                className="p-2 flex items-center justify-center bg-emerald-200/70 text-emerald-600/70 border-2 border-emerald-400 rounded-full shadow-md"
               >
-                <FiCheck size={20} />
+                <FiCheck size={18} />
               </button>
               <button
                 onClick={() => cancelFriendRequest(user.uid, loginedUser.uid)}
-                className="text-sm p-2 flex items-center justify-center bg-rose-200/70 text-rose-600/70 border-2 border-rose-400 rounded-full shadow-md"
+                className="p-2 flex items-center justify-center bg-rose-200/70 text-rose-600/70 border-2 border-rose-400 rounded-full shadow-md"
               >
-                <FiX size={20} />
+                <FiX size={18} />
               </button>
             </div>
           </div>
@@ -355,10 +381,190 @@ const Invites = ({ loginedUser }: TabsProps) => {
   );
 };
 
-const Manage = () => {
+const Manage = ({ loginedUser }: TabsProps) => {
+  const [allFriends, setAllFriends] = useState<UserSearchResult[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState<UserSearchResult | null>(null);
+  const [modalMutualUid, setModalMutualUid] = useState<string[] | null>(null);
+  const [mutualImageUrls, setMutualImageUrls] = useState<string[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      if (!loginedUser?.friends || loginedUser.friends.length === 0) {
+        setAllFriends([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const usersData = await Promise.all(
+          loginedUser.friends.map(async (friendId: string) => {
+            const user = await getUserDetails(friendId);
+            return user;
+          })
+        );
+
+        setAllFriends(usersData.filter(Boolean));
+      } catch (error) {
+        console.error("Error fetching friends:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFriends();
+  }, [loginedUser]);
+
+  useEffect(() => {
+    if (!modalMutualUid || modalMutualUid.length === 0) return;
+
+    const fetchImages = async () => {
+      const urls = await Promise.all(
+        modalMutualUid.map((uid) => getImageUrlByUid(uid))
+      );
+      setMutualImageUrls(urls.filter(Boolean) as string[]);
+    };
+
+    fetchImages();
+  }, [modalMutualUid]);
+
+  if (loading) return <LoadingList title="Your Friends" />;
+  if (!loginedUser || allFriends.length === 0) return <NoFriends />;
+
   return (
-    <div>
-      <NoFriends />
+    <div className="h-full w-full flex flex-col justify-center">
+      <h2 className="text-base text-neutral-500 font-poppins mb-3">
+        Your Friends
+      </h2>
+
+      <div className="flex-grow flex flex-col gap-3">
+        {allFriends.map((user) => (
+          <div
+            key={user.uid}
+            className="flex items-center justify-between gap-3 px-3 py-2 bg-blue-100/40 rounded shadow w-full"
+          >
+            <NavLink
+              to={`/app/user/${user.uid}`}
+              className="flex items-center gap-3 min-w-0"
+            >
+              <img
+                src={user.photoURL || ""}
+                alt={user.name}
+                className="h-10 w-10 rounded-full object-cover shrink-0"
+              />
+              <div className="h-full w-[78%] overflow-hidden flex flex-col justify-between">
+                <p className="text-base text-nowrap font-poppins truncate">
+                  {user.name}
+                </p>
+                <p className="text-[10px] flex gap-1 text-neutral-400 font-poppins">
+                  <span>{getMutualFriends(loginedUser, user).length}</span>
+                  <span>
+                    {getMutualFriends(loginedUser, user).length > 1
+                      ? " mutual friends"
+                      : " mutual friend"}
+                  </span>
+                </p>
+              </div>
+            </NavLink>
+
+            <button
+              onClick={() => {
+                setModalOpen(true);
+                setModalData(user);
+                setModalMutualUid(getMutualFriends(loginedUser, user));
+              }}
+              className="text-sm px-3 py-1.5 text-neutral-700"
+            >
+              <TbDotsVertical size={18} />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {modalOpen && (
+        <div
+          onClick={() => setModalOpen(false)}
+          className="fixed inset-0 z-50 flex items-end bg-black/50"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full h-auto bg-white rounded-t-2xl shadow-xl py-5 px-6 font-poppins animate-slide-up"
+          >
+            {/* Handle */}
+            <div className="w-full flex justify-center mb-5">
+              <div
+                onClick={() => setModalOpen(false)}
+                className="h-1.5 w-20 bg-neutral-300 rounded-full"
+              />
+            </div>
+
+            {/* User Info */}
+            <div className="flex items-center pb-4 border-b border-neutral-200 gap-4 mb-4">
+              <img
+                src={modalData?.photoURL || ""}
+                alt={modalData?.name}
+                className="h-14 w-14 rounded-full object-cover border"
+              />
+              <div className="flex flex-col">
+                <p className="text-lg font-semibold text-neutral-900">
+                  {modalData?.name}
+                </p>
+                <div className="flex justify-center items-center gap-1 text-sm text-neutral-600">
+                  <div className="h-auto flex justify-center -space-x-2">
+                    {mutualImageUrls.slice(0, 2).map((url, index) => (
+                      <img
+                        key={index}
+                        src={url}
+                        alt="mutual"
+                        className="h-5 w-5 rounded-full border-2 border-white object-cover"
+                      />
+                    ))}
+                  </div>
+                  {getMutualFriends(modalData!, loginedUser).length} Mutual
+                  Friend
+                  {getMutualFriends(modalData!, loginedUser).length !== 1 &&
+                    "s"}
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3">
+              <NavLink
+                to={`/app/user/${modalData?.uid}`}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-neutral-100 text-neutral-800 text-sm font-medium hover:bg-neutral-200 transition"
+              >
+                <LuUserRound className="h-5 w-5 text-neutral-600" />
+                View Profile
+              </NavLink>
+
+              <button
+                onClick={() => {
+                  unfriend(loginedUser.uid, modalData!.uid);
+                  setModalOpen(false);
+                  setModalData(null);
+                }}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-neutral-100 text-neutral-800 text-sm font-medium hover:bg-neutral-200 transition"
+              >
+                <LuUserRoundX className="h-5 w-5 text-neutral-600" />
+                Unfriend
+              </button>
+
+              <NavLink
+                to={`/app/chat/${modalData?.uid}`}
+                className="flex items-center gap-3 max-w-full text-nowrap overflow-hidden px-4 py-3 rounded-lg bg-neutral-100 text-neutral-800 text-sm font-medium hover:bg-neutral-200 transition"
+              >
+                <FiMessageSquare className="h-5 w-5 text-neutral-600" />
+                Chat with {modalData?.name.split(" ")[0]}
+              </NavLink>
+
+              <div className="h-10 w-full" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -60,6 +60,24 @@ export async function getUserDetails(uid: string) {
   }
 }
 
+
+export async function getImageUrlByUid(uid: string): Promise<string | null> {
+  try {
+    const userDocRef = doc(db, "users", uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) {
+      return null;
+    }
+
+    const data = userDocSnap.data();
+    return data?.photoURL ?? null; // Handles undefined safely
+  } catch (error) {
+    console.error("Error fetching user photoURL:", error);
+    return null;
+  }
+}
+
 function generateKeywords(name: string): string[] {
   const terms = name.toLowerCase().split(" ");
   const keywords = new Set<string>();
