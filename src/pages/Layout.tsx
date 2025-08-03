@@ -4,10 +4,12 @@ import { Outlet } from "react-router-dom";
 
 const Layout: React.FC = () => {
   return (
-    <div className="h-[100svh] w-full bg-white">
+    <div className="min-h-[100svh] w-full max-w-md mx-auto bg-white sm:border-x-[1.5px] sm:border-neutral-300 flex flex-col">
       <Header />
       <div className="h-12" />
-      <Outlet />
+      <div className="flex-grow">
+        <Outlet />
+      </div>
       <div className="h-24" />
       <Navigation />
     </div>

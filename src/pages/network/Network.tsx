@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { FiCheck, FiMessageSquare, FiSearch, FiX } from "react-icons/fi";
 import { DocumentData, Timestamp } from "firebase/firestore";
+import getMutualFriends from "../../utils/getMutualFriends";
+import { getRelativeTime } from "../../utils/getRelativeTime";
 import {
   searchFriends,
   sendFriendRequest,
@@ -13,11 +14,10 @@ import {
   getLoginedUserDetails,
   getUserDetails,
 } from "../../lib/firestoreHelpers";
-import { getRelativeTime } from "../../utils/getRelativeTime";
-import getMutualFriends from "../../utils/getMutualFriends";
 import { NavLink } from "react-router-dom";
 import { TbDotsVertical } from "react-icons/tb";
 import { LuUserRound, LuUserRoundX } from "react-icons/lu";
+import { FiCheck, FiMessageSquare, FiSearch, FiX } from "react-icons/fi";
 
 enum Tabs {
   INVITES = "invites",
@@ -336,7 +336,7 @@ const Invites = ({ loginedUser }: TabsProps) => {
         {receivedFriendRequests.map((user) => (
           <div
             key={user.uid}
-            className="flex items-center justify-between gap-3 px-3 py-2 bg-blue-100/40 rounded shadow w-full"
+            className="flex items-center justify-between gap-3 px-3 py-2 bg-neutral-100/50 rounded shadow w-full"
           >
             <NavLink
               to={`/app/user/${user.uid}`}
@@ -363,13 +363,13 @@ const Invites = ({ loginedUser }: TabsProps) => {
             <div className="flex gap-2 shrink-0">
               <button
                 onClick={() => acceptFriendRequest(user.uid, loginedUser.uid)}
-                className="p-2 flex items-center justify-center bg-emerald-200/70 text-emerald-600/70 border-2 border-emerald-400 rounded-full shadow-md"
+                className="p-2 flex items-center justify-center bg-emerald-200/60 text-emerald-600/80 border-2 border-emerald-300 rounded-full"
               >
                 <FiCheck size={18} />
               </button>
               <button
                 onClick={() => cancelFriendRequest(user.uid, loginedUser.uid)}
-                className="p-2 flex items-center justify-center bg-rose-200/70 text-rose-600/70 border-2 border-rose-400 rounded-full shadow-md"
+                className="p-2 flex items-center justify-center bg-rose-200/60 text-rose-600/80 border-2 border-rose-300 rounded-full"
               >
                 <FiX size={18} />
               </button>
@@ -434,7 +434,7 @@ const Manage = ({ loginedUser }: TabsProps) => {
   if (!loginedUser || allFriends.length === 0) return <NoFriends />;
 
   return (
-    <div className="h-full w-full flex flex-col justify-center">
+    <div className="h-full max-w-md flex flex-col justify-center">
       <h2 className="text-base text-neutral-500 font-poppins mb-3">
         Your Friends
       </h2>
@@ -443,7 +443,7 @@ const Manage = ({ loginedUser }: TabsProps) => {
         {allFriends.map((user) => (
           <div
             key={user.uid}
-            className="flex items-center justify-between gap-3 px-3 py-2 bg-blue-100/40 rounded shadow w-full"
+            className="flex items-center justify-between gap-3 px-3 py-2 bg-neutral-100/50 rounded shadow w-full"
           >
             <NavLink
               to={`/app/user/${user.uid}`}
@@ -455,10 +455,10 @@ const Manage = ({ loginedUser }: TabsProps) => {
                 className="h-10 w-10 rounded-full object-cover shrink-0"
               />
               <div className="h-full w-[78%] overflow-hidden flex flex-col justify-between">
-                <p className="text-base text-nowrap font-poppins truncate">
+                <p className="text-sm font-poppins font-medium truncate">
                   {user.name}
                 </p>
-                <p className="text-[10px] flex gap-1 text-neutral-400 font-poppins">
+                <p className="text-[10px] text-neutral-400 font-poppins whitespace-nowrap">
                   <span>{getMutualFriends(loginedUser, user).length}</span>
                   <span>
                     {getMutualFriends(loginedUser, user).length > 1
@@ -475,7 +475,7 @@ const Manage = ({ loginedUser }: TabsProps) => {
                 setModalData(user);
                 setModalMutualUid(getMutualFriends(loginedUser, user));
               }}
-              className="text-sm px-3 py-1.5 text-neutral-700"
+              className="px-3 py-2.5 text-neutral-700"
             >
               <TbDotsVertical size={18} />
             </button>
@@ -486,11 +486,11 @@ const Manage = ({ loginedUser }: TabsProps) => {
       {modalOpen && (
         <div
           onClick={() => setModalOpen(false)}
-          className="fixed inset-0 z-50 flex items-end bg-black/50"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/20"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full h-auto bg-white rounded-t-2xl shadow-xl py-5 px-6 font-poppins animate-slide-up"
+            className="w-full max-w-md h-auto bg-white rounded-t-3xl shadow-xl py-5 px-6 font-poppins animate-slide-up"
           >
             {/* Handle */}
             <div className="w-full flex justify-center mb-5">
@@ -512,15 +512,20 @@ const Manage = ({ loginedUser }: TabsProps) => {
                   {modalData?.name}
                 </p>
                 <div className="flex justify-center items-center gap-1 text-sm text-neutral-600">
-                  <div className="h-auto flex justify-center -space-x-2">
-                    {mutualImageUrls.slice(0, 2).map((url, index) => (
+                  <div className="h-auto flex justify-center -space-x-1.5">
+                    {mutualImageUrls.slice(0, 3).map((url, index) => (
                       <img
                         key={index}
                         src={url}
                         alt="mutual"
-                        className="h-5 w-5 rounded-full border-2 border-white object-cover"
+                        className="h-5 w-5 rounded-full border-[1.5px] border-white object-cover"
                       />
                     ))}
+                    {mutualImageUrls.length > 3 && (
+                      <div className="h-5 w-5 rounded-full bg-white border-white ">
+                        <div className="h-5 w-5 rounded-full border-[1.5px] bg-neutral-300 border-white animate-pulse" />
+                      </div>
+                    )}
                   </div>
                   {getMutualFriends(modalData!, loginedUser).length} Mutual
                   Friend
@@ -534,9 +539,9 @@ const Manage = ({ loginedUser }: TabsProps) => {
             <div className="flex flex-col gap-3">
               <NavLink
                 to={`/app/user/${modalData?.uid}`}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-neutral-100 text-neutral-800 text-sm font-medium hover:bg-neutral-200 transition"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-emerald-100/30 text-emerald-800 text-sm font-medium hover:bg-neutral-200 transition"
               >
-                <LuUserRound className="h-5 w-5 text-neutral-600" />
+                <LuUserRound className="h-5 w-5" />
                 View Profile
               </NavLink>
 
@@ -546,17 +551,17 @@ const Manage = ({ loginedUser }: TabsProps) => {
                   setModalOpen(false);
                   setModalData(null);
                 }}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-neutral-100 text-neutral-800 text-sm font-medium hover:bg-neutral-200 transition"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-rose-100/30 text-rose-800 text-sm font-medium hover:bg-neutral-200 transition"
               >
-                <LuUserRoundX className="h-5 w-5 text-neutral-600" />
+                <LuUserRoundX className="h-5 w-5" />
                 Unfriend
               </button>
 
               <NavLink
                 to={`/app/chat/${modalData?.uid}`}
-                className="flex items-center gap-3 max-w-full text-nowrap overflow-hidden px-4 py-3 rounded-lg bg-neutral-100 text-neutral-800 text-sm font-medium hover:bg-neutral-200 transition"
+                className="flex items-center gap-3 max-w-full text-nowrap overflow-hidden px-4 py-3 rounded-lg bg-blue-100/40 text-blue-800 text-sm font-medium hover:bg-neutral-200 transition"
               >
-                <FiMessageSquare className="h-5 w-5 text-neutral-600" />
+                <FiMessageSquare className="h-5 w-5" />
                 Chat with {modalData?.name.split(" ")[0]}
               </NavLink>
 

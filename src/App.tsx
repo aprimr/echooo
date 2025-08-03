@@ -32,7 +32,15 @@ function App() {
           path="/app"
           element={
             <ProtectedRoute>
-              <Layout />
+              <div
+                style={{
+                  backgroundImage:
+                    "url('https://id-frontend.prod-east.frontend.public.atl-paas.net/assets/wac.92a80da2.svg')",
+                  backgroundAttachment: "fixed",
+                }}
+              >
+                <Layout />
+              </div>
             </ProtectedRoute>
           }
         >

@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 
 const NotFound: React.FC = () => {
   const navigate = useNavigate();
-  const [seconds, setSeconds] = useState<number>(5);
+  const [seconds, setSeconds] = useState<number>(3);
 
   useEffect(() => {
     setTimeout(() => {
       navigate("/");
-    }, 5000);
+    }, 3000);
 
     const interval = setInterval(() => {
       setSeconds((prev) => prev - 1);
@@ -32,7 +32,7 @@ const NotFound: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 rounded-3xl blur-3xl opacity-30 transform rotate-6 scale-105"></div>
 
           {/* Card */}
-          <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl px-6 sm:px-8 pb-6 pt-4 max-w-md min-w-sm border border-white/20">
+          <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl px-6 sm:px-8 pb-6 pt-4 w-full max-w-md border border-white/20">
             <div className="space-y-6">
               {/* Header */}
               <div className="flex items-center justify-between">
@@ -54,13 +54,16 @@ const NotFound: React.FC = () => {
                     <div className="h-2 bg-slate-200/50 rounded w-16 mt-1"></div>
                   </div>
                 </div>
-                <div className="bg-blue-100 text-blue-700 w-fit py-3 px-4 rounded-2xl font-poppins rounded-bl-sm ">
+
+                <div className="bg-blue-100 text-blue-700 w-fit py-3 px-4 rounded-2xl font-poppins rounded-bl-sm">
                   Not Found
                 </div>
-                <div className="bg-blue-100 -mt-2 text-blue-700 w-fit py-3 px-4 rounded-2xl font-poppins rounded-bl-sm ">
+
+                <div className="bg-blue-100 -mt-2 text-blue-700 w-fit py-3 px-4 rounded-2xl font-poppins rounded-bl-sm">
                   The page you are looking for is either removed or does not
                   exist
                 </div>
+
                 <p className="mt-4 text-[10px] sm:text-xs text-center font-poppins text-slate-500">
                   Redirecting you to home page in {seconds}s
                 </p>
