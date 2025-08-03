@@ -11,6 +11,7 @@ import NotFound from "./pages/errors/NotFound";
 import Layout from "./pages/Layout";
 import Chats from "./pages/chats/Chats";
 import Network from "./pages/network/Network";
+import EchoooRoom from "./pages/EchoooRoom";
 
 function App() {
   const { checkAuthStatus } = useAuthStore();
@@ -51,6 +52,23 @@ function App() {
           <Route path="me" element={<div>ME</div>} />
           <Route path="user/:id" element={<div>user</div>} />
         </Route>
+
+        <Route
+          path="/app/chats/echoooroom"
+          element={
+            <ProtectedRoute>
+              <div
+                style={{
+                  backgroundImage:
+                    "url('https://id-frontend.prod-east.frontend.public.atl-paas.net/assets/wac.92a80da2.svg')",
+                  backgroundAttachment: "fixed",
+                }}
+              >
+                <EchoooRoom />
+              </div>
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="/error/login" element={<LoginError />} />
         <Route path="/terms&privacy" element={<TermsAndPrivacy />} />

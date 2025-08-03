@@ -1,4 +1,8 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+} from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 import { User } from "firebase/auth";
 
@@ -59,7 +63,6 @@ export async function getUserDetails(uid: string) {
     return null;
   }
 }
-
 
 export async function getImageUrlByUid(uid: string): Promise<string | null> {
   try {

@@ -541,7 +541,7 @@ const Manage = ({ loginedUser }: TabsProps) => {
             <div className="flex flex-col gap-3">
               <NavLink
                 to={`/app/user/${modalData?.uid}`}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-emerald-100/30 text-emerald-800 text-sm font-medium hover:bg-neutral-200 transition"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-emerald-100/30 text-emerald-800 text-sm font-medium hover:bg-emerald-100/40 transition"
               >
                 <LuUserRound className="h-5 w-5" />
                 View Profile
@@ -553,7 +553,7 @@ const Manage = ({ loginedUser }: TabsProps) => {
                   setModalOpen(false);
                   setModalData(null);
                 }}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-rose-100/30 text-rose-800 text-sm font-medium hover:bg-neutral-200 transition"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-rose-100/30 text-rose-800 text-sm font-medium hover:bg-rose-100/40 transition"
               >
                 <LuUserRoundX className="h-5 w-5" />
                 Unfriend
@@ -561,7 +561,7 @@ const Manage = ({ loginedUser }: TabsProps) => {
 
               <NavLink
                 to={`/app/chat/${modalData?.uid}`}
-                className="flex items-center gap-3 max-w-full text-nowrap overflow-hidden px-4 py-3 rounded-lg bg-blue-100/40 text-blue-800 text-sm font-medium hover:bg-neutral-200 transition"
+                className="flex items-center gap-3 max-w-full text-nowrap overflow-hidden px-4 py-3 rounded-lg bg-blue-100/40 text-blue-800 text-sm font-medium hover:bg-blue-100/30 transition"
               >
                 <FiMessageSquare className="h-5 w-5" />
                 Chat with {modalData?.name.split(" ")[0]}

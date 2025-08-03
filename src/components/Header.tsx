@@ -24,10 +24,8 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 mx-auto w-full max-w-md h-12 px-5 flex items-center justify-between bg-white/80 sm:border-x-[1.5px] sm:border-neutral-300 backdrop-blur-md border-b border-white/20 shadow-sm z-50">
-      <p className="text-2xl font-semibold text-gray-900 font-inter tracking-tight">
-        echooo
-      </p>
+    <header className="fixed top-0 left-0 right-0 mx-auto w-full max-w-md h-12 px-5 flex items-center justify-between bg-white/80 border-b sm:border-x-[1.5px] border-b-white/20 sm:border-neutral-300 backdrop-blur-md  shadow-sm z-50">
+      <p className="text-2xl font-semibold text-gray-900 font-nunito">echooo</p>
 
       <div className="flex items-center gap-2 relative">
         {/* Profile Picture */}
@@ -36,7 +34,7 @@ const Header = () => {
           className="h-9 w-9 rounded-full border border-white/40 shadow-md overflow-hidden transition cursor-pointer"
         >
           <img
-            src={user?.photoURL || "../../public/echooo.png"}
+            src={user?.photoURL || ""}
             alt={user?.displayName || "Profile"}
             className="h-full w-full object-cover"
           />

@@ -17,13 +17,15 @@
   scroll-behavior: smooth;
 }
 
-/* Hide scrollbar */
+/* hide scrollbars */
 .scrollbar-hidden {
+  overflow: auto; 
   scrollbar-width: none; 
   -ms-overflow-style: none; 
 }
+
 .scrollbar-hidden::-webkit-scrollbar {
-  display: none;
+  display: none; 
 }
 
 /* Marquee Animation */
@@ -41,4 +43,6 @@
   display: inline-block;
   animation: marquee 30s linear infinite;
 }
+
+
 
