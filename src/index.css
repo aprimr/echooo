@@ -39,6 +39,6 @@
 
 .animate-marquee {
   display: inline-block;
-  animation: marquee 12s linear infinite;
+  animation: marquee 30s linear infinite;
 }
 

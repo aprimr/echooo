@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { PiChats, PiWall, PiUsers, PiUserCircle } from "react-icons/pi";
+import NavigationRibbon from "./NavigationRibbon";
 import { useEffect, useState } from "react";
 import { getLoginedUserDetails } from "../lib/firestoreHelpers";
 import { DocumentData } from "firebase/firestore";
@@ -15,6 +16,7 @@ const Navigation = () => {
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 mx-auto w-full max-w-md h-16 bg-white/80 backdrop-blur-lg border-t sm:border-x-[1.5px] sm:border-neutral-300 border-gray-200 z-50">
+      <NavigationRibbon />
       <div className="flex items-center justify-around h-full px-4">
         {/* Feed */}
         <NavLink

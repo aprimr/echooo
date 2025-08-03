@@ -143,7 +143,7 @@ const NetworkNavigation = ({
             maxLength={50}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 pr-10 py-1 rounded-lg bg-neutral-100/50 text-neutral-800 placeholder:text-neutral-500 border-2 border-neutral-300 focus:outline-none focus:bg-white focus:border-neutral-400 font-poppins transition-all duration-200"
+            className="w-[calc(100%-1rem)] px-4 pr-10 py-1 rounded-lg bg-neutral-100/50 text-neutral-800 placeholder:text-neutral-500 border-2 border-neutral-300 focus:outline-none focus:bg-white focus:border-neutral-400 font-poppins transition-all duration-200"
           />
           {search && (
             <FiX
@@ -152,7 +152,7 @@ const NetworkNavigation = ({
                 setSearch("");
                 setSearchResults([]);
               }}
-              className="absolute right-3 p-0.5 top-1/2 -translate-y-1/2 text-neutral-500 bg-neutral-200/50 rounded-full cursor-pointer hover:text-neutral-700 transition"
+              className="absolute right-6 p-0.5 top-1/2 -translate-y-1/2 text-neutral-500 bg-neutral-200/50 rounded-full cursor-pointer hover:text-neutral-700 transition"
             />
           )}
         </div>
@@ -175,15 +175,16 @@ const NetworkNavigation = ({
         </button>
       </div>
 
-      {/* Search results */}
+      {/* Search results section */}
       {isSearchOpen && (
-        <div className="absolute top-[115px] left-0 w-full min-h-[80svh] bg-white px-4 py-4 pb-20 z-10">
+        <div className="absolute top-[115px] left-1/2 transform -translate-x-1/2 w-full max-w-md min-h-[80svh] border-x-[1.5px] border-neutral-300 bg-white px-4 py-4 pb-20 z-10">
+          {/* Search status text */}
           <p className="text-sm text-neutral-500 font-poppins mb-3">
             {searchResults.length >= 1 ? "Search Results" : "No Results Found"}
           </p>
 
+          {/* Actual search results */}
           <div className="flex flex-col gap-3">
-            {/* Search Result Card */}
             {searchResults?.map((searchUser: DocumentData) => (
               <div
                 key={searchUser.uid}
@@ -221,6 +222,7 @@ const NetworkNavigation = ({
                   </div>
                 </NavLink>
 
+                {/* Add/Cancel Friend Request Buttons */}
                 {loginedUser &&
                   searchUser &&
                   loginedUser.uid !== searchUser.uid && (
