@@ -1,13 +1,17 @@
 import { DocumentData } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { FiChevronLeft, FiInfo, FiSend, FiX } from "react-icons/fi";
-import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
+import {
+  HiOutlineChatBubbleLeftRight,
+  HiOutlinePencil,
+  HiOutlinePlus,
+  HiOutlineTrash,
+} from "react-icons/hi2";
 import { TiWarning } from "react-icons/ti";
-import { VscLoading } from "react-icons/vsc";
 import { auth } from "../firebase/config";
 import { getMessages, sendMessage } from "../lib/echoooRoom";
 import MessagesSkeleton from "./chats/MessagesSkeleton";
-import { HiOutlineDotsVertical } from "react-icons/hi";
+import { HiOutlineDotsVertical, HiOutlineReply } from "react-icons/hi";
 
 interface ChatBubbleProps {
   message: string;
@@ -23,10 +27,8 @@ const formatTime = (timestamp: { seconds: number; nanoseconds: number }) => {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
-const EchoooRoom: React.FC = () => {
+const EchoooRoom = () => {
   const [showRules, setShowRules] = useState<boolean>(false);
-  // const [showErrMsg, setShowErrMsg] = useState<string | null>("");
-  const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [messages, setMessages] = useState<DocumentData[]>([]);
   const [message, setMessage] = useState("");
 
@@ -53,29 +55,21 @@ const EchoooRoom: React.FC = () => {
   const handleSendMessage = async () => {
     const currentUser = auth.currentUser;
     if (!message.trim() || !currentUser) return;
+    const messageText = message.trim();
 
-    // if () {
-    //   setShowErrMsg("");
-    //   setMessage("");
-    //   setTimeout(() => setShowErrMsg(""), 2000);
-    //   return;
-    // }
-
-    setSendingMessage(true);
+    // Clear input field
+    setMessage("");
 
     try {
       await sendMessage({
-        message,
+        message: messageText,
         userId: currentUser.uid,
         userName: currentUser.displayName || "",
         userImage: currentUser.photoURL || "",
         replyToMessageId: null,
       });
-      setMessage("");
     } catch (error) {
       console.error("Failed to send message:", error);
-    } finally {
-      setSendingMessage(false);
     }
   };
 
@@ -181,14 +175,9 @@ const EchoooRoom: React.FC = () => {
         <button
           aria-label="Send message"
           onClick={handleSendMessage}
-          disabled={sendingMessage || !auth.currentUser}
-          className="p-3 bg-blue-500 text-white rounded-xl hover:shadow-md transition-all disabled:bg-neutral-800 sm:p-3.5"
+          className="p-3 bg-blue-500 text-white rounded-xl hover:shadow-md transition-all sm:p-3.5"
         >
-          {sendingMessage ? (
-            <VscLoading size={18} className="animate-spin" />
-          ) : (
-            <FiSend size={20} />
-          )}
+          <FiSend size={20} />
         </button>
       </footer>
     </div>
@@ -202,6 +191,7 @@ const SentChatBubble: React.FC<ChatBubbleProps> = ({
   createdAt,
   reactions = [],
 }) => {
+  // const [messageMenuData, setMessageMenuData] = useState({});
   return (
     <div className="flex items-start gap-2 max-w-[90%] animate-fade-in self-end ml-10">
       <div className="flex flex-col gap-1 w-full items-end">
@@ -223,42 +213,7 @@ const SentChatBubble: React.FC<ChatBubbleProps> = ({
             <HiOutlineDotsVertical size={16} className="text-gray-600 " />
           </div>
 
-          {/* Message Menu */}
-          {/* <div className="fixed inset-0 bg-black/5 z-40 flex items-center justify-center">
-            <div className="bg-white rounded-xl shadow-xs border border-neutral-300 w-48 z-50">
-              <div className="flex justify-between px-3 py-2 border-b border-neutral-200 text-xl">
-                {["👍", "❤️", "😂", "😮", "😢", "🔥"].map((emoji, idx) => (
-                  <button
-                    key={idx}
-                    className="transition-transform hover:scale-125 hover:-rotate-6 duration-200"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex flex-col text-sm text-neutral-700">
-                <button
-                  onClick={() => console.log("Reply")}
-                  className="px-4 py-2 hover:bg-neutral-100 text-left"
-                >
-                  Reply
-                </button>
-                <button
-                  onClick={() => console.log("Edit")}
-                  className="px-4 py-2 hover:bg-neutral-100 text-left"
-                >
-                  Edit Message
-                </button>
-                <button
-                  onClick={() => console.log("Delete")}
-                  className="px-4 py-2 hover:bg-red-50 text-left text-red-500"
-                >
-                  Delete Message
-                </button>
-              </div>
-            </div>
-          </div> */}
+          {/* {messageMenuData && <MessageMenu />} */}
 
           {/* Bubble */}
           <div
@@ -364,6 +319,109 @@ const ReceivedChatBubble: React.FC<ChatBubbleProps> = ({
               })()}
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+const MessageMenu: React.FC = () => {
+  const [isEmojisOpen, setIsEmojisOpen] = useState<boolean>(false);
+
+  const allEmojis = [
+    "👍",
+    "❤️",
+    "😂",
+    "😮",
+    "😢",
+    "🔥",
+    "👏",
+    "🎉",
+    "😎",
+    "💯",
+    "🙌",
+    "😡",
+    "🤔",
+    "😭",
+    "👀",
+    "😳",
+    "😴",
+    "🤯",
+    "🤮",
+    "🤡",
+    "🤗",
+    "🤫",
+    "🫠",
+    "😤",
+  ];
+
+  return (
+    <div className="fixed inset-0 z-40 flex flex-col gap-2 items-center justify-center backdrop-blur-sm bg-black/30">
+      <div className="flex items-start gap-3 w-64">
+        {/* Message Bubble */}
+        <div className="bg-white px-4 py-3 backdrop-blur-sm rounded-2xl shadow-md border border-neutral-200 text-xs font-poppins text-black max-w-[80%] max-h-[49px] line-clamp-2 overflow-hidden">
+          hello
+        </div>
+      </div>
+
+      <div className="bg-white backdrop-blur-xs rounded-2xl shadow-lg border border-white/30 w-64 text-sm overflow-hidden transition-all">
+        {/* Top Emoji Row */}
+        <div className="flex justify-between items-center px-4 py-3 text-xl">
+          {allEmojis.slice(0, 6).map((emoji, idx) => (
+            <button
+              key={idx}
+              className="transition-transform hover:scale-125 hover:-rotate-3 duration-200"
+            >
+              {emoji}
+            </button>
+          ))}
+          <button
+            onClick={() => setIsEmojisOpen(!isEmojisOpen)}
+            className={`text-base ml-1 p-1 text-neutral-500 hover:text-neutral-800 bg-neutral-200/70 hover:bg-neutral-200 rounded-full transition-all duration-200 ${
+              isEmojisOpen ? "rotate-[135deg]" : ""
+            }`}
+            title="More emojis"
+          >
+            <HiOutlinePlus />
+          </button>
+        </div>
+
+        {/* Emoji Grid or Action Buttons */}
+        {isEmojisOpen ? (
+          <div className="grid grid-cols-6 gap-2 p-4 border-t border-neutral-200 text-lg">
+            {allEmojis.slice(6).map((emoji, idx) => (
+              <button
+                key={idx}
+                className="transition-transform hover:scale-125 hover:-rotate-3 duration-200"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col text-neutral-700 border-t border-neutral-200 font-medium">
+            <button
+              onClick={() => console.log("Reply")}
+              className="flex items-center gap-3 px-5 py-3 hover:bg-neutral-100/70 transition active:bg-neutral-200"
+            >
+              <HiOutlineReply className="text-blue-600 text-lg" />
+              Reply
+            </button>
+            <button
+              onClick={() => console.log("Edit")}
+              className="flex items-center gap-3 px-5 py-3 hover:bg-neutral-100/70 transition active:bg-neutral-200"
+            >
+              <HiOutlinePencil className="text-yellow-500 text-lg" />
+              Edit Message
+            </button>
+            <button
+              onClick={() => console.log("Delete")}
+              className="flex items-center gap-3 px-5 py-3 hover:bg-rose-100/50 active:bg-rose-200 transition text-rose-600"
+            >
+              <HiOutlineTrash className="text-lg" />
+              Delete Message
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
