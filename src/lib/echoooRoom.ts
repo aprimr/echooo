@@ -7,6 +7,9 @@ import {
   onSnapshot,
   Timestamp,
   DocumentData,
+  getDocs,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 
@@ -16,6 +19,14 @@ export interface SendMessageProps {
   userName: string;
   userImage: string;
   replyToMessageId?: string | null;
+}
+
+export interface UserDetails {
+  uid: string;
+  name: string;
+  photoURL: string;
+  email: string;
+  friends: string[];
 }
 
 export async function sendMessage({
@@ -69,4 +80,42 @@ export function getMessages(
   });
 
   return unsubscribe;
+}
+
+export async function deleteMessage(messageId: string) {
+  if (!messageId) return;
+
+  try {
+    const messageRef = doc(db, "echoooroom", messageId);
+    await updateDoc(messageRef, {
+      deletedAt: new Date(),
+    });
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function getAllUsers(): Promise<UserDetails[]> {
+  try {
+    const usersCol = collection(db, "users");
+    const usersSnapshot = await getDocs(usersCol);
+
+    const usersList: UserDetails[] = usersSnapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      return {
+        uid: doc.id,
+        name: data.name,
+        photoURL: data.photoURL,
+        email: data.email,
+        friends: data.friends || [],
+      };
+    });
+
+    return usersList;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
 }

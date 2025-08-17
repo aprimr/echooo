@@ -1,8 +1,30 @@
+import { FaRegUser } from "react-icons/fa";
 import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
+import { getAllUsers } from "../../lib/echoooRoom";
+import { useEffect, useState } from "react";
+
+interface UserDetails {
+  uid: string;
+  name: string;
+  photoURL: string;
+  email: string;
+  friends: string[];
+}
 
 const ChatsList = () => {
   const navigate = useNavigate();
+  const [allUsers, setAllUsers] = useState<UserDetails[]>([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const users = await getAllUsers();
+      setAllUsers(users);
+    };
+
+    fetchUsers();
+  }, []);
+
   return (
     <div className="flex flex-col gap-3">
       {/* Header */}
@@ -25,11 +47,15 @@ const ChatsList = () => {
             <h2 className="text-base font-semibold text-gray-800 truncate font-nunito">
               Echooo Room
             </h2>
-            <div className="w-auto flex flex-row gap-1 items-center ">
-              <p className="text-[11px] text-neutral-600 font-inter font-semibold pt-[1px]">
-                2
-              </p>
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+            <div className="w-auto flex flex-row items-center ">
+              {allUsers.length === 0 ? (
+                <div className="h-2.5 w-4 bg-blue-300/50 rounded-full animate-pulse" />
+              ) : (
+                <p className="text-xs text-neutral-600 font-inter font-medium pt-[1px]">
+                  {allUsers.length}
+                </p>
+              )}
+              <FaRegUser className="h-2.5 text-blue-600 " />
             </div>
           </div>
 
